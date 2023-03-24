@@ -1,22 +1,36 @@
-import "./App.css";
-import { Routes, Route } from "react-router-dom";
-import Login from "./pages/Login";
-import { useState } from "react";
-import Home from "./pages/Home";
-function App() {
-  const [userId, setUserId] = useState("");
+import { useEffect } from "react";
+import { Route, Routes, useNavigate } from "react-router-dom";
+import { useLocalStorage } from "./hooks";
+import { HomePage, LoginPage } from "./pages";
 
+function App() {
+  const [userId, setUserId] = useLocalStorage("id");
+  const navigate = useNavigate();
+
+  // Changeing the user id
   const changeUserIdHandler = (id = "") => {
     setUserId(id);
   };
 
-  console.log(userId, "DDDDDDDDDDDDDDDDDD");
+  // If user not exist sending to login page
+  useEffect(() => {
+    if (!userId) {
+      navigate("/login");
+    }
+  }, []);
+
+  // JSX
   return (
     <Routes>
-      <Route path="/" element={<Home />} />
+      <Route path="/" element={<HomePage userId={userId} />} />
       <Route
         path="/login"
-        element={<Login changeUserIdHandler={changeUserIdHandler} />}
+        element={
+          <LoginPage
+            changeUserIdHandler={changeUserIdHandler}
+            userId={userId}
+          />
+        }
       />
     </Routes>
   );
