@@ -1,3 +1,4 @@
 import userRoutes from './user.js';
-
-export { userRoutes };
+import messageRoutes from './messages.js';
+import conversationRoutes from './conversation.js';
+export { userRoutes, messageRoutes, conversationRoutes };
