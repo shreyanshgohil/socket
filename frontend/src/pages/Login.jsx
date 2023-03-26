@@ -1,12 +1,12 @@
-import React, { useEffect, useRef } from "react";
-import { useNavigate } from "react-router-dom";
-import { v4 as uuidv4 } from "uuid";
+import React, { useEffect, useRef } from 'react';
+import { useNavigate } from 'react-router-dom';
+import { v4 as uuidv4 } from 'uuid';
 
 // Login page
 const Login = (props) => {
   // Inits
   const { changeUserIdHandler, userId } = props;
-  const userIdRef = useRef("");
+  const userIdRef = useRef('');
   const navigate = useNavigate();
 
   // For handle the submition of form
@@ -23,7 +23,7 @@ const Login = (props) => {
   //if id is there then redirect to home page
   useEffect(() => {
     if (userId) {
-      navigate("/");
+      navigate('/');
     }
   }, [userId]);
 

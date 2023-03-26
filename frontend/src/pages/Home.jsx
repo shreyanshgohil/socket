@@ -1,11 +1,37 @@
-import { SideBar } from "components/Home";
+import { SideBar } from 'components/Home';
+import { useEffect, useState } from 'react';
 
 const Home = (props) => {
-  const { userId } = props;
+  const [users, setUsers] = useState([]);
+  const [selectCurrentConversation, setSelectCurrentConversation] = useState(
+    {}
+  );
+
+  // For fetch all the users form database for basic version
+  const fetchAllUsers = async () => {
+    const response = await fetch('/user/all');
+    const data = await response.json();
+    setUsers(data.data);
+  };
+
+  // For set the current conversation with someone
+  const selectCurrentConversationHandler = (userId) => {
+    setSelectCurrentConversation(userId);
+  };
+
+  // For fetch the all users
+  useEffect(() => {
+    fetchAllUsers();
+  }, []);
+
   return (
     <div className="flex h-screen antialiased text-gray-800">
       <div className="flex flex-row h-full w-full overflow-x-hidden">
-        <SideBar />
+        <SideBar
+          users={users}
+          selectCurrentConversationHandler={selectCurrentConversationHandler}
+          selectCurrentConversation={selectCurrentConversation}
+        />
         <div className="flex flex-col flex-auto h-full p-6">
           <div className="flex flex-col flex-auto flex-shrink-0 rounded-2xl bg-gray-100 h-full p-4">
             <div className="flex flex-col h-full overflow-x-auto mb-4">
