@@ -4,14 +4,16 @@ import {
   deleteUser,
   getUsers,
   updateUser,
-  getAllUsers
+  getAllUsers,
+  loginUser,
 } from '../controllers/user.js';
 const userRoutes = Router();
 
 userRoutes.get('/all', getAllUsers);
 
-userRoutes.get('/:id', getUsers);
+userRoutes.post('/login', loginUser);
 
+userRoutes.get('/:id', getUsers);
 
 userRoutes.post('/add-user', addUser);
 

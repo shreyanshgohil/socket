@@ -7,7 +7,6 @@ const SideBar = (props) => {
     selectCurrentConversationHandler,
     selectCurrentConversation,
   } = props;
-  console.log('selectCurrentConversation', selectCurrentConversation);
   return (
     <div className="flex flex-col py-8 pl-6 pr-2 w-64 bg-white flex-shrink-0">
       <QuickStart />

@@ -8,7 +8,7 @@ const Conversations = (props) => {
   } = props;
 
   return (
-    <div className="flex flex-col space-y-1 mt-4 -mx-2 h-48 overflow-y-auto">
+    <div className="flex flex-col space-y-1 mt-4 -mx-2 h-[396px] overflow-y-auto">
       {conversations.map((singleUser, index) => {
         return (
           <button

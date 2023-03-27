@@ -1,7 +1,7 @@
 import { SideBar } from 'components/Home';
 import { useEffect, useState } from 'react';
 
-const Home = (props) => {
+const Home = () => {
   const [users, setUsers] = useState([]);
   const [selectCurrentConversation, setSelectCurrentConversation] = useState(
     {}
