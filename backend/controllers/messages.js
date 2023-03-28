@@ -1,14 +1,16 @@
 import Message from '../models/Message.js';
 import { Router } from 'express';
+import mongoose from 'mongoose';
 const messageRoutes = Router();
 
 //create the message
 export const createNewMessage = async (req, res) => {
   try {
     const { conversationId, senderId, userMessage } = req.body;
+    const senderObjectId = new mongoose.Types.ObjectId(senderId);
     const newMessage = new Message({
       conversationId,
-      senderId,
+      senderId: senderObjectId,
       userMessage,
     });
     await newMessage.save();

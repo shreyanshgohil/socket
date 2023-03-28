@@ -21,7 +21,7 @@ export const getConversation = async (req, res) => {
   try {
     const { userId } = req.params;
     const userObjectId = new mongoose.Types.ObjectId(userId);
-    // console.log(_bsontype, 'SSSSSS');
+
     const conversations = await Conversation.aggregate([
       { $match: { members: { $in: [userObjectId] } } },
       {
@@ -29,7 +29,20 @@ export const getConversation = async (req, res) => {
           from: 'users',
           foreignField: '_id',
           localField: 'members',
-          as: 'UserData',
+          as: 'userData',
+        },
+      },
+      {
+        $project: {
+          logedInUserFriend: {
+            $filter: {
+              input: '$userData',
+              as: 'sc',
+              cond: {
+                $ne: ['$$sc._id', userObjectId],
+              },
+            },
+          },
         },
       },
     ]);
