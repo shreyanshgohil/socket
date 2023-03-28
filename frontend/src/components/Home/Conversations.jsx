@@ -13,18 +13,18 @@ const Conversations = (props) => {
         return (
           <button
             className={`flex flex-row items-center hover:bg-gray-100 rounded-xl p-2 ${
-              selectCurrentConversation._id === singleUser._id && 'bg-gray-100'
+              selectCurrentConversation === singleUser._id && 'bg-gray-100'
             }`}
             key={index}
             onClick={() => {
-              selectCurrentConversationHandler(singleUser);
+              selectCurrentConversationHandler(singleUser._id);
             }}
           >
             <div className="flex items-center justify-center h-8 w-8 bg-indigo-200 rounded-full">
-              {singleUser.userName.charAt(0)}
+              {singleUser.logedInUserFriend[0].userName.charAt(0)}
             </div>
             <div className="ml-2 text-sm font-semibold">
-              {singleUser.userName}
+              {singleUser.logedInUserFriend[0].userName}
             </div>
           </button>
         );
