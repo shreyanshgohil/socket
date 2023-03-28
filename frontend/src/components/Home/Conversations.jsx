@@ -2,14 +2,14 @@ import React from 'react';
 
 const Conversations = (props) => {
   const {
-    conversations,
+    userConversations,
     selectCurrentConversationHandler,
     selectCurrentConversation,
   } = props;
 
   return (
-    <div className="flex flex-col space-y-1 mt-4 -mx-2 h-[396px] overflow-y-auto">
-      {conversations.map((singleUser, index) => {
+    <div className="flex flex-col space-y-1 mt-4 -mx-2 h-[200px] overflow-y-auto">
+      {userConversations.map((singleUser, index) => {
         return (
           <button
             className={`flex flex-row items-center hover:bg-gray-100 rounded-xl p-2 ${

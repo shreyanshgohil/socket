@@ -1,4 +1,5 @@
 import Conversation from '../models/Conversation.js';
+import mongoose from 'mongoose';
 
 // For create a new conversation
 export const createNewConversation = async (req, res) => {
@@ -19,9 +20,19 @@ export const createNewConversation = async (req, res) => {
 export const getConversation = async (req, res) => {
   try {
     const { userId } = req.params;
-    const conversations = await Conversation.find({
-      members: { $in: [userId] },
-    });
+    const userObjectId = new mongoose.Types.ObjectId(userId);
+    // console.log(_bsontype, 'SSSSSS');
+    const conversations = await Conversation.aggregate([
+      { $match: { members: { $in: [userObjectId] } } },
+      {
+        $lookup: {
+          from: 'users',
+          foreignField: '_id',
+          localField: 'members',
+          as: 'UserData',
+        },
+      },
+    ]);
 
     res
       .status(200)

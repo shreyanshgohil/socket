@@ -1,3 +1,3 @@
-import SideBar from "./SideBar";
-
-export { SideBar };
+import SideBar from './SideBar';
+import Message from './Message';
+export { SideBar, Message };

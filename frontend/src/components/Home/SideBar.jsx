@@ -3,7 +3,7 @@ import QuickStart from './QuickStart';
 
 const SideBar = (props) => {
   const {
-    users: activeConversations,
+    userConversations,
     selectCurrentConversationHandler,
     selectCurrentConversation,
   } = props;
@@ -14,11 +14,11 @@ const SideBar = (props) => {
         <div className="flex flex-row items-center justify-between text-xs">
           <span className="font-bold">Active Conversations</span>
           <span className="flex items-center justify-center bg-gray-300 h-4 w-4 rounded-full">
-            {activeConversations.length}
+            {userConversations.length}
           </span>
         </div>
         <Conversations
-          conversations={activeConversations}
+          userConversations={userConversations}
           selectCurrentConversationHandler={selectCurrentConversationHandler}
           selectCurrentConversation={selectCurrentConversation}
         />
