@@ -12,6 +12,7 @@ const Home = () => {
   const [userConversations, serUserConversations] = useState([]);
   const [userChats, setUserChats] = useState([]);
   const [userEnteredMessage, setUserEnteredMessage] = useState('');
+  const [socketUsers, setSocketUsers] = useState([]);
   const socketRef = useRef(io('ws://localhost:5000'));
   const [selectCurrentConversation, setSelectCurrentConversation] =
     useState('');
@@ -34,6 +35,7 @@ const Home = () => {
       navigate('/login');
     }
   };
+  console.log(userConversations, '!!!!!!!!!!!!!');
 
   // For fetch all the conversations
   const fetchAllMessagesHandler = async () => {
@@ -58,6 +60,15 @@ const Home = () => {
       senderId: logedInUser._id,
       userMessage: userEnteredMessage,
     };
+    const currentConversation = userConversations.find(
+      (singleConversation) =>
+        singleConversation._id === selectCurrentConversation
+    );
+    console.log(currentConversation, socketUsers, 'SSHSHSSHSHS');
+    const reciverSocketId = socketUsers.find(
+      (singleUser) =>
+        singleUser.userId === currentConversation.logedInUserFriend[0]._id
+    );
     await api('/messages/', {
       body: messageBody,
       method: 'POST',
@@ -67,6 +78,13 @@ const Home = () => {
     });
     setUserChats([...userChats, messageBody]);
     setUserEnteredMessage('');
+    if (reciverSocketId) {
+      socketRef.current.emit('message', {
+        userId: logedInUser._id,
+        reciverId: reciverSocketId.socketId,
+        message: messageBody,
+      });
+    }
   };
 
   // for handle the submition of form
@@ -78,7 +96,14 @@ const Home = () => {
   // for socket emmit
 
   useEffect(() => {
-    // socketRef.current.emit() /// from hear contine work
+    if (logedInUser) {
+      socketRef.current.emit('addUser', logedInUser._id);
+      socketRef.current.on('getUsers', (users) => {
+        setSocketUsers(users);
+      });
+    } else {
+      navigate('/login');
+    }
   }, []);
 
   //for handle the scroll at bottom

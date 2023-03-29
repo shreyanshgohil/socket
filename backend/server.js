@@ -9,6 +9,7 @@ import {
 } from './routes/index.js';
 
 const app = express();
+let users = [];
 const server = http.createServer(app);
 const io = new Server(server, {
   cors: {
@@ -17,8 +18,46 @@ const io = new Server(server, {
 });
 app.use(express.json());
 
+// For add the user
+const addUser = (userId, socketId) => {
+  const isUserExist = users.some((singleUser) => singleUser._id === userId);
+  if (!isUserExist) {
+    users.push({ userId, socketId });
+  }
+};
+
+// For remove the user
+const removeUser = (socketId) => {
+  users = users.filter((singleUser) => singleUser.socketId !== socketId);
+};
+
+// For find the user
+const getUser = (userId) => {
+  users.find((singleUser) => singleUser.userId === userId);
+};
+
 io.on('connection', (socket) => {
-  console.log('connnected to user name space', socket.id);
+  // For add an user
+  socket.on('addUser', (userId) => {
+    console.log(userId, 'USERID');
+    addUser(userId, socket.id);
+    io.emit('getUsers', users);
+  });
+
+  // For get and send message
+  socket.on('message', ({ userId, reciverId, message }) => {
+    // const user = getUser(reciverId);
+    io.to(reciverId).emit('getMessage', {
+      userId,
+      message,
+    });
+  });
+
+  // For remove an user
+  socket.on('disconnect', () => {
+    removeUser(socket.id);
+    io.emit('getUsers', users);
+  });
 });
 
 app.use('/user', userRoutes);
