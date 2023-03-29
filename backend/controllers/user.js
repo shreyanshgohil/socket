@@ -99,7 +99,6 @@ export const getAllUsers = async (req, res, next) => {
 
 export const loginUser = async (req, res, next) => {
   try {
-    console.log(req.body);
     const { email = '', password = '' } = req.body;
     const user = await User.findOne({ email });
     if (!user) {

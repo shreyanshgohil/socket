@@ -1,14 +1,18 @@
 import { Message, SideBar } from 'components/Home';
 import { useUserContext } from 'context/User';
-import { useEffect, useState } from 'react';
-import { api } from 'utils/common';
+import { useEffect, useState, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { api } from 'utils/common';
+import { io, Socket } from 'socket.io-client';
 
 const Home = () => {
   const { user: logedInUser } = useUserContext();
+  const navigate = useNavigate();
+  const scrollableRef = useRef(null);
   const [userConversations, serUserConversations] = useState([]);
   const [userChats, setUserChats] = useState([]);
-  const navigate = useNavigate();
+  const [userEnteredMessage, setUserEnteredMessage] = useState('');
+  const socketRef = useRef(io('ws://localhost:5000'));
   const [selectCurrentConversation, setSelectCurrentConversation] =
     useState('');
 
@@ -35,13 +39,58 @@ const Home = () => {
   const fetchAllMessagesHandler = async () => {
     if (logedInUser) {
       if (selectCurrentConversation) {
-        const data = await api(`/messages/${selectCurrentConversation}`);
-        console.log(data);
+        const { status, messages } = await api(
+          `/messages/${selectCurrentConversation}`
+        );
+        if (status === 200) {
+          setUserChats(messages);
+        }
       }
     } else {
       navigate('/login');
     }
   };
+
+  // For add the messages to current conversations
+  const addMessageToConversation = async () => {
+    const messageBody = {
+      conversationId: selectCurrentConversation,
+      senderId: logedInUser._id,
+      userMessage: userEnteredMessage,
+    };
+    await api('/messages/', {
+      body: messageBody,
+      method: 'POST',
+      headers: {
+        'Content-type': 'application/json',
+      },
+    });
+    setUserChats([...userChats, messageBody]);
+    setUserEnteredMessage('');
+  };
+
+  // for handle the submition of form
+  const sendMessageFormHandler = (event) => {
+    event.preventDefault();
+    addMessageToConversation();
+  };
+
+  // for socket emmit
+
+  useEffect(() => {
+    // socketRef.current.emit() /// from hear contine work
+  }, []);
+
+  //for handle the scroll at bottom
+  useEffect(() => {
+    if (logedInUser) {
+      if (scrollableRef.current) {
+        scrollableRef.current.scrollTop = userChats.length * 1000;
+      }
+    } else {
+      navigate('/login');
+    }
+  }, [userChats]);
 
   // For fetch all the conversations
   useEffect(() => {
@@ -53,6 +102,7 @@ const Home = () => {
     fetchAllMessagesHandler();
   }, [selectCurrentConversation]);
 
+  // JSX
   return userConversations.length > 0 ? (
     <div className="flex h-screen antialiased text-gray-800">
       <div className="flex flex-row h-full w-full overflow-x-hidden">
@@ -64,10 +114,24 @@ const Home = () => {
         {selectCurrentConversation && (
           <div className="flex flex-col flex-auto h-full p-6">
             <div className="flex flex-col flex-auto flex-shrink-0 rounded-2xl bg-gray-100 h-full p-4">
-              <div className="flex flex-col h-full overflow-x-auto mb-4">
+              <div
+                className="flex flex-col h-full overflow-x-auto mb-4"
+                ref={scrollableRef}
+              >
                 <div className="flex flex-col h-full">
                   <div className="grid grid-cols-12 gap-y-2">
-                    <Message isSender={true} />
+                    {userChats.map((singleMessage) => {
+                      let isSender =
+                        logedInUser._id === singleMessage.senderId
+                          ? true
+                          : false;
+                      return (
+                        <Message
+                          isSender={isSender}
+                          singleMessage={singleMessage}
+                        />
+                      );
+                    })}
                   </div>
                 </div>
               </div>
@@ -90,11 +154,18 @@ const Home = () => {
                     </svg>
                   </button>
                 </div>
-                <div className="flex-grow ml-4">
+                <form
+                  className="flex-grow ml-4 flex items-center"
+                  onSubmit={sendMessageFormHandler}
+                >
                   <div className="relative w-full">
                     <input
                       type="text"
                       className="flex w-full border rounded-xl focus:outline-none focus:border-indigo-300 pl-4 h-10"
+                      onChange={(e) => {
+                        setUserEnteredMessage(e.target.value);
+                      }}
+                      value={userEnteredMessage}
                     />
                     <button className="absolute flex items-center justify-center h-full w-12 right-0 top-0 text-gray-400 hover:text-gray-600">
                       <svg
@@ -113,28 +184,28 @@ const Home = () => {
                       </svg>
                     </button>
                   </div>
-                </div>
-                <div className="ml-4">
-                  <button className="flex items-center justify-center bg-indigo-500 hover:bg-indigo-600 rounded-xl text-white px-4 py-1 flex-shrink-0">
-                    <span>Send</span>
-                    <span className="ml-2">
-                      <svg
-                        className="w-4 h-4 transform rotate-45 -mt-px"
-                        fill="none"
-                        stroke="currentColor"
-                        viewBox="0 0 24 24"
-                        xmlns="http://www.w3.org/2000/svg"
-                      >
-                        <path
-                          strokeLinecap="round"
-                          strokeLinejoin="round"
-                          strokeWidth="2"
-                          d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8"
-                        ></path>
-                      </svg>
-                    </span>
-                  </button>
-                </div>
+                  <div className="ml-4">
+                    <button className="flex items-center justify-center bg-indigo-500 hover:bg-indigo-600 rounded-xl text-white px-4 py-1 flex-shrink-0">
+                      <span>Send</span>
+                      <span className="ml-2">
+                        <svg
+                          className="w-4 h-4 transform rotate-45 -mt-px"
+                          fill="none"
+                          stroke="currentColor"
+                          viewBox="0 0 24 24"
+                          xmlns="http://www.w3.org/2000/svg"
+                        >
+                          <path
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                            strokeWidth="2"
+                            d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8"
+                          ></path>
+                        </svg>
+                      </span>
+                    </button>
+                  </div>
+                </form>
               </div>
             </div>
           </div>

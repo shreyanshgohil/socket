@@ -1,6 +1,6 @@
 import React from 'react';
 
-const Message = ({ isSender }) => {
+const Message = ({ isSender, singleMessage }) => {
   return (
     <div
       className={
@@ -24,7 +24,7 @@ const Message = ({ isSender }) => {
             isSender ? 'bg-indigo-100' : 'bg-white'
           }`}
         >
-          <div>Hey How are you today?</div>
+          <div>{singleMessage.userMessage}</div>
         </div>
       </div>
     </div>
