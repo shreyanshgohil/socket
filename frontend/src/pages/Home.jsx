@@ -127,6 +127,16 @@ const Home = () => {
     fetchAllMessagesHandler();
   }, [selectCurrentConversation]);
 
+  useEffect(() => {
+    if (logedInUser) {
+      socketRef.current.on('getMessage', ({ userId, message }) => {
+        setUserChats([...userChats, message]);
+      });
+    } else {
+      navigate('/login');
+    }
+  }, []);
+
   // JSX
   return userConversations.length > 0 ? (
     <div className="flex h-screen antialiased text-gray-800">

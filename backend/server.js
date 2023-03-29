@@ -39,7 +39,6 @@ const getUser = (userId) => {
 io.on('connection', (socket) => {
   // For add an user
   socket.on('addUser', (userId) => {
-    console.log(userId, 'USERID');
     addUser(userId, socket.id);
     io.emit('getUsers', users);
   });
