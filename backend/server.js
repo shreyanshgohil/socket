@@ -10,7 +10,6 @@ import {
 } from './routes/index.js';
 
 const app = express();
-// let users = [];
 const server = http.createServer(app);
 const io = new Server(server, {
   cors: {
@@ -30,6 +29,17 @@ io.on('connection', (socket) => {
   // for say someone logedIn
   socket.on('userLogedIn', ({ userData }) => {
     socket.broadcast.emit('loginDone');
+  });
+
+  //for join the room of video calling
+  socket.on('start-call', (startCallBody) => {
+    const { callerEmail, userName, socketId } = startCallBody;
+    io.to(socketId).emit('calling', { startCallBody });
+  });
+
+  // for got out from the video call
+  socket.on('end-call', ({ callerEmail, userName, socketId }) => {
+    console.log(callerEmail, userName, socketId);
   });
 
   // For remove an user

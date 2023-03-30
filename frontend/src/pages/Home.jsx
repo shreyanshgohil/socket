@@ -1,4 +1,5 @@
-import { Message, SideBar } from 'components/Home';
+import { Message, SideBar, VideoCallButton } from 'components/Home';
+import IncomingCall from 'components/Home/IncomingCall';
 import { useUserContext } from 'context/User';
 import { useEffect, useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
@@ -83,24 +84,6 @@ const Home = ({ socketRef }) => {
     addMessageToConversation();
   };
 
-  // // For set the socket id to the databse
-  // const setSocketIdToDb = async () => {
-  //   const userBody = {
-  //     email: logedInUser.email,
-  //     newDataOfUser: {
-  //       socketId: socketRef.current.id,
-  //     },
-  //   };
-
-  //   await api('/user/update-user', {
-  //     method: 'POST',
-  //     headers: {
-  //       'Content-type': 'application/json',
-  //     },
-  //     body: userBody,
-  //   });
-  // };
-
   //for handle the scroll at bottom
   useEffect(() => {
     if (logedInUser) {
@@ -131,22 +114,12 @@ const Home = ({ socketRef }) => {
         });
       });
       socketRef.current.on('userLogedIn', () => {
-        debugger;
         fetchAllConversationos();
       });
     } else {
       navigate('/login');
     }
   }, []);
-
-  // // For set the socket id to database
-  // useEffect(() => {
-  //   if (logedInUser) {
-  //     setSocketIdToDb();
-  //   } else {
-  //     navigate('/login');
-  //   }
-  // }, []);
 
   //useEffect
   useEffect(() => {
@@ -162,6 +135,7 @@ const Home = ({ socketRef }) => {
   // JSX
   return userConversations.length > 0 ? (
     <div className="flex h-screen antialiased text-gray-800">
+      <IncomingCall socketRef={socketRef} />
       <div className="flex flex-row h-full w-full overflow-x-hidden">
         <SideBar
           userConversations={userConversations}
@@ -171,6 +145,11 @@ const Home = ({ socketRef }) => {
         {selectCurrentConversation && (
           <div className="flex flex-col flex-auto h-full p-6">
             <div className="flex flex-col flex-auto flex-shrink-0 rounded-2xl bg-gray-100 h-full p-4">
+              <VideoCallButton
+                socketRef={socketRef}
+                selectCurrentConversation={selectCurrentConversation}
+                logedInUser={logedInUser}
+              />
               <div
                 className="flex flex-col h-full overflow-x-auto mb-4"
                 ref={scrollableRef}
