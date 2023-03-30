@@ -4,13 +4,13 @@ import { useUserContext } from 'context/User';
 import { api } from 'utils/common';
 
 // Login page
-const Login = () => {
+const Login = ({ socketRef }) => {
   // Inits
   const emailRef = useRef('');
   const passwordRef = useRef('');
   const { setUserDataHandler } = useUserContext();
   const navigate = useNavigate();
-
+  console.log(socketRef);
   // For handle the login process of the user
   const loginHandler = async () => {
     const body = {
@@ -27,6 +27,7 @@ const Login = () => {
 
     if (status === 200) {
       setUserDataHandler(data);
+      socketRef.current.emit('userLogedIn', { userData: data });
       navigate('/');
     }
   };

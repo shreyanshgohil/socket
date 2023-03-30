@@ -44,21 +44,18 @@ export const updateUser = async (req, res) => {
     if (!user) {
       return res.status(400).json('User not found');
     } else {
-      if (isValidAuthorization) {
-        if (!('password' in newDataOfUser)) {
-          await User.updateOne({ email }, { $set: { ...newDataOfUser } });
-        } else {
-          newDataOfUser.password = await gerateHasedPassword(
-            newDataOfUser.password
-          );
-          await User.updateOne({ email }, { $set: { ...newDataOfUser } });
-        }
-        return res.status(200).json('user updated sucessfully');
+      if (!('password' in newDataOfUser)) {
+        await User.updateOne({ email }, { $set: { ...newDataOfUser } });
       } else {
-        return res.status(400).json('Please enter the correct password');
+        newDataOfUser.password = await gerateHasedPassword(
+          newDataOfUser.password
+        );
+        await User.updateOne({ email }, { $set: { ...newDataOfUser } });
       }
+      return res.status(200).json('user updated sucessfully');
     }
   } catch (err) {
+    console.log(err);
     return res.status(500).json('Something went wrong');
   }
 };

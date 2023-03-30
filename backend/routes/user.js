@@ -17,7 +17,7 @@ userRoutes.get('/:id', getUsers);
 
 userRoutes.post('/add-user', addUser);
 
-userRoutes.patch('/update-user', updateUser);
+userRoutes.post('/update-user', updateUser);
 
 userRoutes.delete('/delete-user', deleteUser);
 

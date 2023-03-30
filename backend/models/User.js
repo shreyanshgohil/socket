@@ -23,7 +23,6 @@ const userSchema = new mongoose.Schema(
     password: {
       type: String,
       required: true,
-
     },
     profilePicture: {
       type: String,
@@ -64,6 +63,10 @@ const userSchema = new mongoose.Schema(
         default: [],
       },
     ],
+    socketId: {
+      type: String,
+      default: null,
+    },
   },
   { timestamps: true }
 );

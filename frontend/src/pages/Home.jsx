@@ -1,19 +1,16 @@
 import { Message, SideBar } from 'components/Home';
 import { useUserContext } from 'context/User';
-import { useEffect, useState, useRef } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { api } from 'utils/common';
-import { io, Socket } from 'socket.io-client';
 
-const Home = () => {
+const Home = ({ socketRef }) => {
   const { user: logedInUser } = useUserContext();
   const navigate = useNavigate();
   const scrollableRef = useRef(null);
   const [userConversations, serUserConversations] = useState([]);
   const [userChats, setUserChats] = useState([]);
   const [userEnteredMessage, setUserEnteredMessage] = useState('');
-  const [socketUsers, setSocketUsers] = useState([]);
-  const socketRef = useRef(io('ws://localhost:5000'));
   const [selectCurrentConversation, setSelectCurrentConversation] =
     useState('');
 
@@ -35,14 +32,13 @@ const Home = () => {
       navigate('/login');
     }
   };
-  console.log(userConversations, '!!!!!!!!!!!!!');
 
   // For fetch all the conversations
   const fetchAllMessagesHandler = async () => {
     if (logedInUser) {
       if (selectCurrentConversation) {
         const { status, messages } = await api(
-          `/messages/${selectCurrentConversation}`
+          `/messages/${selectCurrentConversation._id}`
         );
         if (status === 200) {
           setUserChats(messages);
@@ -60,15 +56,7 @@ const Home = () => {
       senderId: logedInUser._id,
       userMessage: userEnteredMessage,
     };
-    const currentConversation = userConversations.find(
-      (singleConversation) =>
-        singleConversation._id === selectCurrentConversation
-    );
-    console.log(currentConversation, socketUsers, 'SSHSHSSHSHS');
-    const reciverSocketId = socketUsers.find(
-      (singleUser) =>
-        singleUser.userId === currentConversation.logedInUserFriend[0]._id
-    );
+
     await api('/messages/', {
       body: messageBody,
       method: 'POST',
@@ -78,10 +66,12 @@ const Home = () => {
     });
     setUserChats([...userChats, messageBody]);
     setUserEnteredMessage('');
-    if (reciverSocketId) {
+
+    if (selectCurrentConversation.logedInUserFriend[0].socketId) {
       socketRef.current.emit('message', {
         userId: logedInUser._id,
-        reciverId: reciverSocketId.socketId,
+        reciverSocketId:
+          selectCurrentConversation.logedInUserFriend[0].socketId,
         message: messageBody,
       });
     }
@@ -93,18 +83,23 @@ const Home = () => {
     addMessageToConversation();
   };
 
-  // for socket emmit
+  // For set the socket id to the databse
+  const setSocketIdToDb = async () => {
+    const userBody = {
+      email: logedInUser.email,
+      newDataOfUser: {
+        socketId: socketRef.current.id,
+      },
+    };
 
-  useEffect(() => {
-    if (logedInUser) {
-      socketRef.current.emit('addUser', logedInUser._id);
-      socketRef.current.on('getUsers', (users) => {
-        setSocketUsers(users);
-      });
-    } else {
-      navigate('/login');
-    }
-  }, []);
+    await api('/user/update-user', {
+      method: 'POST',
+      headers: {
+        'Content-type': 'application/json',
+      },
+      body: userBody,
+    });
+  };
 
   //for handle the scroll at bottom
   useEffect(() => {
@@ -127,10 +122,37 @@ const Home = () => {
     fetchAllMessagesHandler();
   }, [selectCurrentConversation]);
 
+  // for get and set the message
   useEffect(() => {
     if (logedInUser) {
       socketRef.current.on('getMessage', ({ userId, message }) => {
-        setUserChats([...userChats, message]);
+        setUserChats((prevState) => {
+          return [...prevState, message];
+        });
+      });
+      socketRef.current.on('userLogedIn', () => {
+        debugger;
+        fetchAllConversationos();
+      });
+    } else {
+      navigate('/login');
+    }
+  }, []);
+
+  // For set the socket id to database
+  useEffect(() => {
+    if (logedInUser) {
+      setSocketIdToDb();
+    } else {
+      navigate('/login');
+    }
+  }, []);
+
+  //useEffect
+  useEffect(() => {
+    if (logedInUser) {
+      socketRef.current.on('loginDone', () => {
+        fetchAllConversationos();
       });
     } else {
       navigate('/login');
@@ -155,13 +177,14 @@ const Home = () => {
               >
                 <div className="flex flex-col h-full">
                   <div className="grid grid-cols-12 gap-y-2">
-                    {userChats.map((singleMessage) => {
+                    {userChats.map((singleMessage, index) => {
                       let isSender =
                         logedInUser._id === singleMessage.senderId
                           ? true
                           : false;
                       return (
                         <Message
+                          key={index}
                           isSender={isSender}
                           singleMessage={singleMessage}
                         />
