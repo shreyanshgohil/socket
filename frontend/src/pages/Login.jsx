@@ -10,7 +10,25 @@ const Login = ({ socketRef }) => {
   const passwordRef = useRef('');
   const { setUserDataHandler } = useUserContext();
   const navigate = useNavigate();
-  console.log(socketRef);
+
+  // For set the socket id to the databse
+  const setSocketIdToDb = async (email) => {
+    const userBody = {
+      email: email,
+      newDataOfUser: {
+        socketId: socketRef.current.id,
+      },
+    };
+
+    await api('/user/update-user', {
+      method: 'POST',
+      headers: {
+        'Content-type': 'application/json',
+      },
+      body: userBody,
+    });
+  };
+
   // For handle the login process of the user
   const loginHandler = async () => {
     const body = {
@@ -27,6 +45,7 @@ const Login = ({ socketRef }) => {
 
     if (status === 200) {
       setUserDataHandler(data);
+      await setSocketIdToDb(body.email);
       socketRef.current.emit('userLogedIn', { userData: data });
       navigate('/');
     }

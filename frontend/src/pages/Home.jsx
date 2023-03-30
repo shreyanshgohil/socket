@@ -83,23 +83,23 @@ const Home = ({ socketRef }) => {
     addMessageToConversation();
   };
 
-  // For set the socket id to the databse
-  const setSocketIdToDb = async () => {
-    const userBody = {
-      email: logedInUser.email,
-      newDataOfUser: {
-        socketId: socketRef.current.id,
-      },
-    };
+  // // For set the socket id to the databse
+  // const setSocketIdToDb = async () => {
+  //   const userBody = {
+  //     email: logedInUser.email,
+  //     newDataOfUser: {
+  //       socketId: socketRef.current.id,
+  //     },
+  //   };
 
-    await api('/user/update-user', {
-      method: 'POST',
-      headers: {
-        'Content-type': 'application/json',
-      },
-      body: userBody,
-    });
-  };
+  //   await api('/user/update-user', {
+  //     method: 'POST',
+  //     headers: {
+  //       'Content-type': 'application/json',
+  //     },
+  //     body: userBody,
+  //   });
+  // };
 
   //for handle the scroll at bottom
   useEffect(() => {
@@ -139,14 +139,14 @@ const Home = ({ socketRef }) => {
     }
   }, []);
 
-  // For set the socket id to database
-  useEffect(() => {
-    if (logedInUser) {
-      setSocketIdToDb();
-    } else {
-      navigate('/login');
-    }
-  }, []);
+  // // For set the socket id to database
+  // useEffect(() => {
+  //   if (logedInUser) {
+  //     setSocketIdToDb();
+  //   } else {
+  //     navigate('/login');
+  //   }
+  // }, []);
 
   //useEffect
   useEffect(() => {
