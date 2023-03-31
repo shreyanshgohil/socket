@@ -39,10 +39,12 @@ export const updateUser = async (req, res) => {
     const { email, password = '', newDataOfUser } = req.body;
     const user = await User.findOne({ email });
     if ('email' in newDataOfUser) {
-      return res.status(400).json('You can not update your email id');
+      return res
+        .status(400)
+        .json({ message: 'You can not update your email id' });
     }
     if (!user) {
-      return res.status(400).json('User not found');
+      return res.status(400).json({ message: 'User not found' });
     } else {
       if (!('password' in newDataOfUser)) {
         await User.updateOne({ email }, { $set: { ...newDataOfUser } });
@@ -52,11 +54,11 @@ export const updateUser = async (req, res) => {
         );
         await User.updateOne({ email }, { $set: { ...newDataOfUser } });
       }
-      return res.status(200).json('user updated sucessfully');
+      return res.status(200).json({ message: 'user updated sucessfully' });
     }
   } catch (err) {
     console.log(err);
-    return res.status(500).json('Something went wrong');
+    return res.status(500).json({ message: 'Something went wrong' });
   }
 };
 

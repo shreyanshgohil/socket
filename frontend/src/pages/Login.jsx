@@ -20,13 +20,14 @@ const Login = ({ socketRef }) => {
       },
     };
 
-    await api('/user/update-user', {
+    const response = await api('/user/update-user', {
       method: 'POST',
       headers: {
         'Content-type': 'application/json',
       },
       body: userBody,
     });
+    return response;
   };
 
   // For handle the login process of the user

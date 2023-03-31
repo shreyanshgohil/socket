@@ -5,8 +5,11 @@ const IncomingCall = (props) => {
   const [incomingCall, setIncomingCall] = useState(false);
 
   useEffect(() => {
-    socketRef.current.on('calling', () => {
+    socketRef.current.on('add-call', () => {
       setIncomingCall(true);
+    });
+    socketRef.current.on('end-call', () => {
+      setIncomingCall(false);
     });
   }, []);
   return incomingCall ? <h1>IncomingCall</h1> : null;

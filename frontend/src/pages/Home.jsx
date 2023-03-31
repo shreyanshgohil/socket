@@ -28,6 +28,16 @@ const Home = ({ socketRef }) => {
       );
       if (status === 200) {
         serUserConversations(conversations);
+        setSelectCurrentConversation((prevState) => {
+          const currentConversationUser = conversations.find(
+            (singleConversation) => singleConversation._id === prevState._id
+          );
+          if (currentConversationUser) {
+            return currentConversationUser;
+          } else {
+            return prevState;
+          }
+        });
       }
     } else {
       navigate('/login');
@@ -112,9 +122,6 @@ const Home = ({ socketRef }) => {
         setUserChats((prevState) => {
           return [...prevState, message];
         });
-      });
-      socketRef.current.on('userLogedIn', () => {
-        fetchAllConversationos();
       });
     } else {
       navigate('/login');
