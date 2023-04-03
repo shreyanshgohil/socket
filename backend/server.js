@@ -33,8 +33,8 @@ io.on('connection', (socket) => {
 
   //for join the room of video calling
   socket.on('start-call', (startCallBody) => {
-    const { callerEmail, userName, socketId } = startCallBody;
-    io.to(socketId).emit('add-call', {});
+    const { socketId } = startCallBody;
+    io.to(socketId).emit('add-call', { startCallBody });
   });
 
   // for got out from the video call

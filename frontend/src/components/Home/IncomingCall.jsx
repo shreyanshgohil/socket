@@ -5,7 +5,8 @@ const IncomingCall = (props) => {
   const [incomingCall, setIncomingCall] = useState(false);
 
   useEffect(() => {
-    socketRef.current.on('add-call', () => {
+    socketRef.current.on('add-call', ({ startCallBody }) => {
+      console.log(startCallBody, 'SHREYANSH');
       setIncomingCall(true);
     });
     socketRef.current.on('end-call', () => {
