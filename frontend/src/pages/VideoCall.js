@@ -9,14 +9,16 @@ const VideoCall = () => {
       audio: true,
       video: true,
     });
-    sendStream(stream);
+    await sendStream(stream);
     setMyStream(stream);
   };
 
   return (
     <div>
       <ReactPlayer url={myStream} playing muted></ReactPlayer>
-      <ReactPlayer url={remoteStream} playing muted></ReactPlayer>
+      {remoteStream && (
+        <ReactPlayer url={remoteStream} playing muted></ReactPlayer>
+      )}
       <button
         onClick={() => {
           getUserMediaStream();
