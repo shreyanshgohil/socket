@@ -40,7 +40,12 @@ io.on('connection', (socket) => {
   // for got out from the video call
   socket.on('end-call', (startCallBody) => {
     const { callerEmail, userName, socketId } = startCallBody;
-    io.to(socketId).emit('end-call', {});
+    io.to(socketId).emit('reject-call', {});
+  });
+
+  // For acept the call
+  socket.on('call-acepted', ({ ans, logedInUser, callerUserData }) => {
+    io.to(callerUserData.callerSocketId).emit('call-acepted', { ans });
   });
 
   // For remove an user
