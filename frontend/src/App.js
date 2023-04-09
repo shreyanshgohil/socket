@@ -3,6 +3,7 @@ import { useEffect, useRef } from 'react';
 import { Route, Routes, useNavigate } from 'react-router-dom';
 import { io } from 'socket.io-client';
 import { HomePage, LoginPage } from './pages';
+import VideoCall from 'pages/VideoCall';
 
 function App() {
   const navigate = useNavigate();
@@ -20,6 +21,9 @@ function App() {
     <Routes>
       <Route path="/" element={<HomePage socketRef={socketRef} />} />
       <Route path="/login" element={<LoginPage socketRef={socketRef} />} />
+      <Route path="/call">
+        <Route path=":emailId" element={<VideoCall />} />
+      </Route>
     </Routes>
   );
 }

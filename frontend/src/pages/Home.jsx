@@ -1,5 +1,6 @@
 import { Message, SideBar, VideoCallButton } from 'components/Home';
 import IncomingCall from 'components/Home/IncomingCall';
+import { usePeerContext } from 'context/Peer';
 import { useUserContext } from 'context/User';
 import { useEffect, useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
@@ -14,12 +15,11 @@ const Home = ({ socketRef }) => {
   const [userEnteredMessage, setUserEnteredMessage] = useState('');
   const [selectCurrentConversation, setSelectCurrentConversation] =
     useState('');
-
+  const { setRemoteAns } = usePeerContext();
   // For set the current conversation with someone
   const selectCurrentConversationHandler = (userId) => {
     setSelectCurrentConversation(userId);
   };
-
   // For fetch all the conversations
   const fetchAllConversationos = async () => {
     if (logedInUser) {
@@ -134,6 +134,9 @@ const Home = ({ socketRef }) => {
       socketRef.current.on('loginDone', () => {
         fetchAllConversationos();
       });
+      socketRef.current.on('call-acepted', async ({ ans }) => {
+        await setRemoteAns(ans);
+      });
     } else {
       navigate('/login');
     }
@@ -142,7 +145,11 @@ const Home = ({ socketRef }) => {
   // JSX
   return userConversations.length > 0 ? (
     <div className="flex h-screen antialiased text-gray-800">
-      <IncomingCall socketRef={socketRef} />
+      <IncomingCall
+        socketRef={socketRef}
+        selectCurrentConversation={selectCurrentConversation}
+        logedInUser={logedInUser}
+      />
       <div className="flex flex-row h-full w-full overflow-x-hidden">
         <SideBar
           userConversations={userConversations}

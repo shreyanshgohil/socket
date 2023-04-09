@@ -36,6 +36,7 @@ const Login = ({ socketRef }) => {
       email: emailRef.current.value,
       password: passwordRef.current.value,
     };
+    await setSocketIdToDb(body.email);
     const { status, data } = await api('/user/login', {
       method: 'POST',
       headers: {
@@ -46,7 +47,6 @@ const Login = ({ socketRef }) => {
 
     if (status === 200) {
       setUserDataHandler(data);
-      await setSocketIdToDb(body.email);
       socketRef.current.emit('userLogedIn', { userData: data });
       navigate('/');
     }
