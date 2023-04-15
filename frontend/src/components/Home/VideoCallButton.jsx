@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { usePeerContext } from 'context/Peer';
 import { useNavigate } from 'react-router-dom';
 // For the perform the video call
@@ -6,7 +6,7 @@ const VideoCallButton = (props) => {
   // Inits
   const [toggleCall, setToggleCall] = useState(false);
   const { socketRef, selectCurrentConversation, logedInUser } = props;
-  const { createOffer } = usePeerContext();
+  const { createOffer, peer } = usePeerContext();
   const navigate = useNavigate();
   //   For connect to the video call
   const connectVideoCallHandler = async () => {
@@ -27,6 +27,23 @@ const VideoCallButton = (props) => {
     }
     setToggleCall(!toggleCall);
   };
+
+  const negotiationneededHandler = async () => {
+    debugger;
+    const startCallobj = {
+      callerEmail: logedInUser.email,
+      userName: logedInUser.userName,
+      socketId: selectCurrentConversation?.logedInUserFriend[0]?.socketId,
+      callerSocketId: logedInUser.socketId,
+    };
+    const offer = await createOffer();
+
+    socketRef.current.emit('peer:nego:needed', { offer, ...startCallobj });
+  };
+
+  useEffect(() => {
+    peer.addEventListener('negotiationneeded', negotiationneededHandler);
+  }, []);
 
   //   JSX
   return selectCurrentConversation?.logedInUserFriend[0]?.socketId ? (

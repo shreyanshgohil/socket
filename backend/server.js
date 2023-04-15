@@ -8,7 +8,11 @@ import {
   messageRoutes,
   userRoutes,
 } from './routes/index.js';
+import { fileURLToPath } from 'url';
+import path, { dirname } from 'path';
 
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = dirname(__filename);
 const app = express();
 const server = http.createServer(app);
 const io = new Server(server, {
@@ -48,6 +52,13 @@ io.on('connection', (socket) => {
     io.to(callerUserData.callerSocketId).emit('call-acepted', { ans });
   });
 
+  socket.on('peer:nego:needed', ({ offer, socketId, callerSocketId }) => {
+    io.to(socketId).emit('peer:nego:needed', { offer, callerSocketId });
+  });
+
+  socket.on('peer:nego:done', ({ ans, callerSocketId }) => {
+    io.to(callerSocketId).emit('peer:nego:final', { ans });
+  });
   // For remove an user
   socket.on('disconnect', async () => {
     await User.updateOne({ socketId: socket.id }, { $set: { socketId: null } });
@@ -57,9 +68,13 @@ io.on('connection', (socket) => {
 app.use('/user', userRoutes);
 app.use('/conversation', conversationRoutes);
 app.use('/messages', messageRoutes);
+app.use(express.static('build'));
+app.get('/', (req, res, next) => {
+  res.sendFile(path.join(__dirname, 'build', 'index.html'));
+});
 
 await mongoose
-  .connect('mongodb://localhost:27017/chat')
+  .connect('mongodb+srv://admin:admin@cluster0.q09m7zs.mongodb.net/test')
   .then(() => console.log('connected with database'));
 
 server.listen(5000);

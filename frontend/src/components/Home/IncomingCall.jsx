@@ -18,11 +18,11 @@ const IncomingCall = (props) => {
         callerUserData,
       });
 
-      const stream = await navigator.mediaDevices.getUserMedia({
-        audio: true,
-        video: true,
-      });
-      await sendStream(stream);
+      // const stream = await navigator.mediaDevices.getUserMedia({
+      //   audio: true,
+      //   video: true,
+      // });
+      // await sendStream(stream);
       navigate(`/call/${callerUserData.callerEmail}`);
     } else {
       // const startCallobj = {
