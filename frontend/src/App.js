@@ -8,7 +8,7 @@ import VideoCall from 'pages/VideoCall';
 function App() {
   const navigate = useNavigate();
   const { user } = useUserContext();
-  const socketRef = useRef(io('https://d8e0-122-161-184-230.ngrok-free.app'));
+  const socketRef = useRef(io('ws://localhost:3000/'));
   // If user not exist sending to login page
   useEffect(() => {
     if (!user) {

@@ -1,6 +1,8 @@
 import React, { useEffect, useState } from 'react';
 import ReactPlayer from 'react-player';
 import { usePeerContext } from 'context/Peer';
+
+// For handle the video call procedure
 const VideoCall = ({ socketRef }) => {
   const [myStream, setMyStream] = useState(null);
   const { sendStream, remoteStream, setRemoteAns, createAnswer } =
@@ -14,41 +16,31 @@ const VideoCall = ({ socketRef }) => {
     setMyStream(stream);
   };
 
+  // Handle the starting of nagotiation
   const handleIncomeingNegotiation = async ({ offer, callerSocketId }) => {
     const ans = await createAnswer(offer);
     socketRef.current.emit('peer:nego:done', { ans, callerSocketId });
   };
 
+  // Handle the complation of negotiation
   const handleFinalNegotiation = async ({ ans }) => {
     await setRemoteAns(ans);
   };
+
   useEffect(() => {
     socketRef.current.on('peer:nego:needed', handleIncomeingNegotiation);
     socketRef.current.on('peer:nego:final', handleFinalNegotiation);
-  });
+    return () => {
+      socketRef.current.off('peer:nego:needed', handleIncomeingNegotiation);
+      socketRef.current.off('peer:nego:final', handleFinalNegotiation);
+    };
+  }, []);
 
-  useEffect(() => {}, [myStream, remoteStream]);
-
-  // const negotiationneededHandler = async () => {
-  //   const startCallobj = {
-  //     callerEmail: logedInUser.email,
-  //     userName: logedInUser.userName,
-  //     socketId: selectCurrentConversation?.logedInUserFriend[0]?.socketId,
-  //     callerSocketId: logedInUser.socketId,
-  //   };
-  //   const offer = await createOffer();
-
-  //   socketRef.current.emit('peer:nego:needed', { offer, ...startCallobj });
-  // };
-
-  // useEffect(() => {
-  //   peer.addEventListener('negotiationneeded', negotiationneededHandler);
-  // }, []);
-
+  // JSX
   return (
     <div>
       <h1>My stream</h1>
-      <ReactPlayer url={myStream} playing muted></ReactPlayer>
+      <ReactPlayer url={myStream} playing muted controls={true}></ReactPlayer>
       <h1>Remote stream</h1>
       {remoteStream && <ReactPlayer url={remoteStream} playing></ReactPlayer>}
       <button

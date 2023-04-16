@@ -7,6 +7,8 @@ import { useNavigate } from 'react-router-dom';
 import { api } from 'utils/common';
 
 const Home = ({ socketRef }) => {
+  // Inits
+
   const { user: logedInUser } = useUserContext();
   const navigate = useNavigate();
   const scrollableRef = useRef(null);
