@@ -29,7 +29,6 @@ const VideoCallButton = (props) => {
   };
 
   const negotiationneededHandler = async () => {
-    debugger;
     const startCallobj = {
       callerEmail: logedInUser.email,
       userName: logedInUser.userName,

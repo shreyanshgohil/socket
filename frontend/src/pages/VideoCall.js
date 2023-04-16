@@ -42,7 +42,9 @@ const VideoCall = ({ socketRef }) => {
       <h1>My stream</h1>
       <ReactPlayer url={myStream} playing muted controls={true}></ReactPlayer>
       <h1>Remote stream</h1>
-      {remoteStream && <ReactPlayer url={remoteStream} playing></ReactPlayer>}
+      {remoteStream && (
+        <ReactPlayer url={remoteStream} playing controls={true}></ReactPlayer>
+      )}
       <button
         onClick={() => {
           getUserMediaStream();
