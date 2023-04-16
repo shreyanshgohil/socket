@@ -52,13 +52,16 @@ io.on('connection', (socket) => {
     io.to(callerUserData.callerSocketId).emit('call-acepted', { ans });
   });
 
+  // For start the negotiation process
   socket.on('peer:nego:needed', ({ offer, socketId, callerSocketId }) => {
     io.to(socketId).emit('peer:nego:needed', { offer, callerSocketId });
   });
 
+  // For complate the negotiation process
   socket.on('peer:nego:done', ({ ans, callerSocketId }) => {
     io.to(callerSocketId).emit('peer:nego:final', { ans });
   });
+
   // For remove an user
   socket.on('disconnect', async () => {
     await User.updateOne({ socketId: socket.id }, { $set: { socketId: null } });
